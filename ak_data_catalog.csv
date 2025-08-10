@@ -1,0 +1,15 @@
+category,subcategory,dataset_name,typical_api,frequency,primary_keys,fields_notes,params,incremental_strategy,refresh,doc
+Reference,Index,index_constituents_SSE50,index_stock_cons,static,index_code+symbol,"symbol list, weight if available","symbol='000016'",full refresh weekly,weekly,https://akshare.akfamily.xyz
+Equity,China A,prices_equity_1d_qfq,stock_zh_a_hist,1d,symbol+date,"OHLCV, amount, pct_change, turnover","period='daily', adjust='qfq', start_date, end_date",append by trade date,daily,https://akshare.akfamily.xyz
+Equity,China A,prices_equity_1m,stock_zh_a_minute,1m,symbol+datetime,"OHLCV","period='1', start_date",append by minute,daily,https://akshare.akfamily.xyz
+Equity,China A,financial_statements,stock_financial_abstract,quarterly,symbol+report_date,"income, balance, cashflow (summary)","symbol, date",upsert by report date,quarterly,https://akshare.akfamily.xyz
+ETF,China,etf_prices_1d,fund_etf_hist_em,1d,symbol+date,"OHLCV, amount","symbol, start_date",append daily,daily,https://akshare.akfamily.xyz
+Fund,Open-end,fund_nav_daily,fund_open_fund_info_em,1d,code+date,"nav, accum_nav","code/symbol, start_date",append daily,daily,https://akshare.akfamily.xyz
+Flows,Northbound,northbound_net_flow,stock_hsgt_north_net_flow_in,1d,date,"net inflow, net buy, turnover","start_date, end_date",append daily,daily,https://akshare.akfamily.xyz
+Margin,Shanghai,margin_trading_sse,stock_margin_sse,1d,trade_date+symbol,"financing balance, short interest","date",append daily,daily,https://akshare.akfamily.xyz
+Market,Board,top_list_lhb,stock_lhb_em,1d,date+symbol,"buy/sell amounts, seats","date",append daily,daily,https://akshare.akfamily.xyz
+Futures,China,futures_daily,futures_zh_daily_sina,1d,symbol+date,"OHLCV, open interest","symbol, start_date, end_date",append daily,daily,https://akshare.akfamily.xyz
+Options,China SSE,options_daily_sse,option_sse_daily,1d,contract_code+date,"close, iv, greeks (if available)","date",append daily,daily,https://akshare.akfamily.xyz
+Macro,China,macro_china_cpi,macro_china_cpi,monthly,date,"CPI YoY, MoM","",append monthly,monthly,https://akshare.akfamily.xyz
+Rates,China,china_yield_curve,macro_china_yield,1d,date+tenor,"yield by tenor","",append daily,daily,https://akshare.akfamily.xyz
+Calendar,China,cn_trading_calendar,tool_trade_date_hist_sina,static,date,"is_open (derive)","",full refresh yearly,yearly,https://akshare.akfamily.xyz

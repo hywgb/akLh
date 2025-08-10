@@ -1,0 +1,76 @@
+output_root: /workspace/data/ak_parquet
+
+# 全局默认（可在数据集内覆盖）
+defaults:
+  write:
+    format: parquet
+    engine: pyarrow
+    compression: zstd
+
+# 数据集定义
+datasets:
+  # 参考：上证50成分
+  - id: index_constituents_000016
+    api: index_stock_cons
+    params:
+      symbol: "000016"
+    primary_keys: ["index_code", "symbol"]
+    normalize:
+      add:
+        index_code: "000016"
+    write:
+      path: "${output_root}/reference/index_constituents"
+      partition_by: ["index_code"]
+
+  # A股日线（前复权），以上证50成分为符号来源
+  - id: equity_a_daily_qfq_from_000016
+    api: stock_zh_a_hist
+    symbols_source:
+      type: index_constituents
+      index_code: "000016"
+      field: "品种代码"
+    params:
+      period: "daily"
+      start_date: "${start_date}"
+      end_date: "${end_date}"
+      adjust: "qfq"
+    rename:
+      日期: date
+      开盘: open
+      收盘: close
+      最高: high
+      最低: low
+      成交量: volume
+      成交额: amount
+      涨跌幅: pct_change
+      换手率: turnover
+    add_cols:
+      dataset: "equity_a_daily_qfq"
+      freq: "1d"
+      adjust: "qfq"
+    primary_keys: ["symbol", "date"]
+    write:
+      path: "${output_root}/prices_equity_1d"
+      partition_by: ["dataset", "adjust", "year", "symbol"]
+
+  # 510300 ETF 日线
+  - id: etf_daily_510300
+    api: fund_etf_hist_em
+    symbols: ["510300"]
+    params:
+      start_date: "${start_date}"
+    rename:
+      日期: date
+      开盘: open
+      收盘: close
+      最高: high
+      最低: low
+      成交量: volume
+      成交额: amount
+    add_cols:
+      dataset: "etf_daily"
+      freq: "1d"
+    primary_keys: ["symbol", "date"]
+    write:
+      path: "${output_root}/prices_etf_1d"
+      partition_by: ["dataset", "year", "symbol"]

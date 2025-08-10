@@ -1,0 +1,84 @@
+output_root: /workspace/data/ak_parquet
+
+defaults:
+  write:
+    format: parquet
+    engine: pyarrow
+    compression: zstd
+
+datasets:
+  - id: index_constituents_000300
+    api: index_stock_cons
+    params:
+      symbol: "000300"
+    write:
+      path: "${output_root}/reference/index_constituents"
+      partition_by: ["index_code"]
+
+  - id: equity_a_daily_qfq_from_000300
+    api: stock_zh_a_hist
+    symbols_source:
+      type: index_constituents
+      index_code: "000300"
+    params:
+      period: "daily"
+      start_date: "${start_date}"
+      end_date: "${end_date}"
+      adjust: "qfq"
+    rename:
+      日期: date
+      开盘: open
+      收盘: close
+      最高: high
+      最低: low
+      成交量: volume
+      成交额: amount
+      涨跌幅: pct_change
+      换手率: turnover
+    add_cols:
+      dataset: "equity_a_daily_qfq"
+      freq: "1d"
+      adjust: "qfq"
+    primary_keys: ["symbol", "date"]
+    write:
+      path: "${output_root}/prices_equity_1d"
+      partition_by: ["dataset", "adjust", "year", "symbol"]
+
+  - id: northbound_flow_daily
+    api: stock_hsgt_hist_em
+    params:
+      symbol: "北向资金"
+    rename:
+      日期: date
+    add_cols:
+      dataset: "northbound_flow"
+    primary_keys: ["date"]
+    write:
+      path: "${output_root}/flows_northbound_1d"
+      partition_by: ["dataset", "year"]
+
+  - id: margin_trading_sse
+    api: stock_margin_sse
+    params: {}
+    rename:
+      日期: date
+      股票代码: symbol
+    add_cols:
+      dataset: "margin_sse"
+    primary_keys: ["date", "symbol"]
+    write:
+      path: "${output_root}/margin_sse_1d"
+      partition_by: ["dataset", "year"]
+
+  - id: trading_calendar_cn
+    api: tool_trade_date_hist_sina
+    params: {}
+    rename:
+      trade_date: date
+      日期: date
+    add_cols:
+      dataset: "calendar_cn"
+    primary_keys: ["date"]
+    write:
+      path: "${output_root}/calendar_cn"
+      partition_by: ["dataset", "year"]
