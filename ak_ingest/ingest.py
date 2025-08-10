@@ -46,8 +46,13 @@ def safe_ak_call(func_name: str, kwargs: Dict[str, Any]) -> pd.DataFrame:
 def fetch_index_constituents(index_code: str) -> pd.DataFrame:
     df = safe_ak_call("index_stock_cons", {"symbol": index_code})
     # Standardize common column names, but keep raw as-is for traceability
-    if "品种代码" in df.columns and "代码" not in df.columns:
+    # Prefer a unified column '代码' for symbol selection
+    if "代码" in df.columns:
+        pass
+    elif "品种代码" in df.columns:
         df = df.rename(columns={"品种代码": "代码"})
+    elif "股票代码" in df.columns:
+        df = df.rename(columns={"股票代码": "代码"})
     df["index_code"] = index_code
     return df
 

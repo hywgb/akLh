@@ -16,3 +16,7 @@ AkShare 数据采集脚手架
 - 首次运行会从 AkShare 源站抓取数据，请合理限速。脚本内已做基础重试与限速。
 - AkShare 接口与字段可能变动，配置中提供列重命名，可按需调整。
 - 更多数据集可在 `config.yaml` 中按已有样式扩展。
+
+核心采集（A股+北向+融资融券+日历）
+- 运行：
+  python /workspace/ak_ingest/ingest.py --config /workspace/ak_ingest/config_cn_core.yaml --start 20200101 --end 20200331 --output-root /workspace/data/ak_parquet
