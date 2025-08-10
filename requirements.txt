@@ -1,0 +1,5 @@
+akshare>=1.13.99
+pandas>=2.0.0
+pyarrow>=12.0.0
+PyYAML>=6.0.0
+tqdm>=4.66.0
